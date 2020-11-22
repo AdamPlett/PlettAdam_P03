@@ -17,6 +17,12 @@ public class ThirdPersonMovement : MonoBehaviour
     int sprintCount;
     Vector3 moveDir;
 
+    //ground check
+    public Transform groundCheck;
+    public float groundDistance = 0.4f;
+    public LayerMask groundMask;
+    bool isGrounded;
+
     //gravitational velocity
     Vector3 gVelocity;
     //gravity
@@ -31,6 +37,12 @@ public class ThirdPersonMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        if (isGrounded && gVelocity.y < 0)
+        {
+            gVelocity.y = -2f;
+        }
+
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             if (sprintCount % 2 == 0) isSprinting = true;
