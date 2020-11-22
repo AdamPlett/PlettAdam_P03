@@ -10,7 +10,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
     public float speed = 6f;
     public float sprintSpeed = 10f;
-    public float dashDistance = 200f;
+    public float dashDistance = 1500f;
     public float turnSmoothTime = 0.1f;
     bool isSprinting;
     int sprintCount;
@@ -52,6 +52,6 @@ public class ThirdPersonMovement : MonoBehaviour
     }
     void teleport()
     {
-        controller.Move(moveDir.normalized * dashDistance * Time.deltaTime);
+        player.transform.position += moveDir * dashDistance * Time.deltaTime;
     }
 }
