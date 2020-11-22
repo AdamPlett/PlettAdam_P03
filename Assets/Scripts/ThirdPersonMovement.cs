@@ -7,14 +7,20 @@ public class ThirdPersonMovement : MonoBehaviour
     public CharacterController controller;
     public GameObject player;
     public Transform cam;
-
+    
     public float speed = 6f;
     public float sprintSpeed = 10f;
     public float dashDistance = 1500f;
     public float turnSmoothTime = 0.1f;
+
     bool isSprinting;
     int sprintCount;
     Vector3 moveDir;
+
+    //gravitational velocity
+    Vector3 gVelocity;
+    //gravity
+    public float gravity = -9.81f;
 
     float turnSmoothVelocity;
     private void Start()
@@ -49,9 +55,11 @@ public class ThirdPersonMovement : MonoBehaviour
             if (isSprinting == true) controller.Move(moveDir.normalized * sprintSpeed * Time.deltaTime);
             else controller.Move(moveDir.normalized * speed * Time.deltaTime);
         }
+        gVelocity.y += gravity * Time.deltaTime;
+        controller.Move(gVelocity * Time.deltaTime);
     }
     void teleport()
     {
-        player.transform.position += moveDir * dashDistance * Time.deltaTime;
+        controller.Move( moveDir * dashDistance * Time.deltaTime);
     }
 }
