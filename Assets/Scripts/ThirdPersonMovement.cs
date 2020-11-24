@@ -10,12 +10,18 @@ public class ThirdPersonMovement : MonoBehaviour
     
     public float speed = 6f;
     public float sprintSpeed = 10f;
-    public float dashDistance = 1500f;
+    public float teleportDistance = 1500f;
     public float turnSmoothTime = 0.1f;
 
     bool isSprinting;
     int sprintCount;
     Vector3 moveDir;
+
+    public AudioSource tpSound;
+    public ParticleSystem tpCircleStart;
+    public ParticleSystem tpCircleEnd;
+    bool isTeleporting;
+    public GameObject trail;
 
     //ground check
     public Transform groundCheck;
@@ -33,6 +39,8 @@ public class ThirdPersonMovement : MonoBehaviour
     {
         isSprinting = false;
         sprintCount = 0;
+        isTeleporting = false;
+        trail.SetActive(false);
     }
     // Update is called once per frame
     void Update()
@@ -49,9 +57,9 @@ public class ThirdPersonMovement : MonoBehaviour
             else isSprinting = false;
             sprintCount++;
         }
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if ((Input.GetKeyDown(KeyCode.LeftShift)) && (isTeleporting == false))
         {
-            teleport();
+            startTeleport();
         }
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxis("Vertical");
@@ -70,8 +78,32 @@ public class ThirdPersonMovement : MonoBehaviour
         gVelocity.y += gravity * Time.deltaTime;
         controller.Move(gVelocity * Time.deltaTime);
     }
-    void teleport()
+    void startTeleport()
     {
-        controller.Move( moveDir * dashDistance * Time.deltaTime);
+        isTeleporting = true;
+        player.SetActive(false);
+        tpSound.Play();
+        StartCoroutine(teleportSequence());
+        Invoke(nameof(Teleport), .25f);
+        trail.SetActive(true);
+    }
+    IEnumerator teleportSequence()
+    {
+        ParticleSystem circle = Instantiate(tpCircleStart, player.transform.position, cam.transform.rotation);
+        circle.Play();
+        yield return new WaitForSeconds(1f);
+        Destroy(circle.gameObject);
+    }
+    void Teleport()
+    {
+        controller.Move(moveDir * teleportDistance * Time.deltaTime);
+        tpCircleEnd.Play();
+        Invoke(nameof(endTeleport), .25f);
+    }
+    void endTeleport()
+    {
+        player.SetActive(true);
+        isTeleporting = false;
+        trail.SetActive(false);
     }
 }
